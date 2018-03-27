@@ -113,14 +113,12 @@ namespace Simple
             {
                 char ch;
                 reader.TryPeek(out ch);
-                if (char.IsLetterOrDigit(ch) || ch == '_')
-                {
-                    sb.Append(ch);
-                    reader.Read(); // we peeked above
-                    position++;
-                }
-                else
+                if (!char.IsLetterOrDigit(ch) && ch != '_')
                     break;
+                
+                sb.Append(ch);
+                reader.Read(); // we peeked above
+                position++;
             }
             return new Token(start, sb.ToString(), Token.Types.Identifier);
         }
@@ -134,6 +132,7 @@ namespace Simple
             {
                 if (!reader.TryRead(out ch))
                     return Token.None;
+
                 position++;
             } while (ch != '"');
             return new Token(start, sb.ToString(), Token.Types.String);

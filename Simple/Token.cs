@@ -5,11 +5,11 @@ namespace Simple
     class Token
     {
         public static readonly Token None = new Token(0, null, 0);
-        
+
+        public bool HasValue => Start > 0;
         public int Start { get; }
         public string Text { get; }
         public Types Type { get; }
-        public bool HasValue => Start > 0;
 
         public Token(int start, string text, Types type)
         {
@@ -40,5 +40,6 @@ namespace Simple
             Then,
             Else,
         }
+
     }
 }

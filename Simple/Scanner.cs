@@ -78,6 +78,18 @@ namespace Simple
                         return ReadMinus();
                     case '+':
                         return ReadPlus();
+                    case ';':
+                        return ReadSemiColon();
+                    case ':':
+                        return ReadAssignment();
+                    case '=':
+                        return ReadEquality();
+                    case '#':
+                        return ReadInqeuality();
+                    case '<':
+                        return ReadLessThan();
+                    case '>':
+                        return ReadGreaterhan();
                     default:
                         if (char.IsLetter(ch))
                             return ReadIdentifier(ch);
@@ -86,10 +98,48 @@ namespace Simple
             }
         }
 
-        private Token ReadPlus()
+        private Token ReadAssignment()
         {
-            return new Token(position, "+", Token.Types.Plus);
+            Expect('=');
+            return new Token(position - 1, ":=", Token.Types.Assign);
         }
+
+        private Token ReadEquality() => new Token(position, "=", Token.Types.Equal);
+
+        private Token ReadInqeuality() => new Token(position, "#", Token.Types.NotEqual);
+
+        private Token ReadGreaterhan()
+        {
+            return Accept('=') ? new Token(position - 1, ">=", Token.Types.GreaterOrEqual) : new Token(position, ">", Token.Types.Greater);
+        }
+
+        private Token ReadLessThan()
+        {
+            return Accept('=') ? new Token(position - 1, "<=", Token.Types.LessOrEqual) : new Token(position, "<", Token.Types.Less);
+        }
+
+        bool Expect(char ch)
+        {
+            if (!Accept(ch))
+                throw new ParseException($"Expected '{ch}' at {position}");
+            return true;
+        }
+
+        private bool Accept(char ch)
+        {
+            char actual;
+            if (reader.TryPeek(out actual) && actual == ch)
+            {
+                reader.Read();
+                position++;
+                return true;
+            }
+            return false;
+        }
+
+        private Token ReadSemiColon() => new Token(position, ";", Token.Types.SemiColon);
+
+        private Token ReadPlus() => new Token(position, "+", Token.Types.Plus);
 
         private Token ReadMinus()
         {
@@ -123,7 +173,7 @@ namespace Simple
             return new Token(start, sb.ToString(), Token.Types.Identifier);
         }
 
-        public Token ReadString()
+        private Token ReadString()
         {
             var start = position;
             char ch;
@@ -138,7 +188,7 @@ namespace Simple
             return new Token(start, sb.ToString(), Token.Types.String);
         }
 
-        public Token ReadInteger(char first)
+        private Token ReadInteger(char first)
         {
             var start = position;
             sb.Clear();
@@ -181,5 +231,22 @@ namespace Simple
         {
             throw new NotImplementedException();
         }
+
+        public bool Accept(Token.Types type)
+        {
+            if (Current.Type != type)
+                return false;
+
+            MoveNext();
+            return true;
+        }
+
+        public bool Expect(Token.Types type)
+        {
+            if (!Accept(type))
+                throw new ParseException($"Expected a {type} but got '{Current.Text}' at {Current.Start}");
+            return true;
+        }
+
     }
 }

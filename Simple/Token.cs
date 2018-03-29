@@ -25,6 +25,8 @@ namespace Simple
                 case "if": return Types.If;
                 case "then": return Types.Then;
                 case "else": return Types.Else;
+                case "elsif": return Types.Elsif;
+                case "end": return Types.End;
                 default: return type;
             }
         }
@@ -39,6 +41,16 @@ namespace Simple
             If,
             Then,
             Else,
+            Elsif,
+            End,
+            SemiColon,
+            GreaterOrEqual,
+            Greater,
+            LessOrEqual,
+            Less,
+            Equal,
+            NotEqual,
+            Assign,
         }
 
     }
